@@ -3,10 +3,11 @@ const cors = require("cors");
 const { default: mongoose } = require("mongoose");
 const UserModel = require("./models/User.js");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const app = express();
+app.use(cors({ credentials: true, origin: true }));
 app.use(express.json());
-app.use(cors({ credentials: true, origin: "http://127.0.0.1" }));
 mongoose.connect(
   "mongodb+srv://itzbasatmaqsood:SLlu9tzyflvHckaO@booking-app.9aulubl.mongodb.net/?retryWrites=true&w=majority&appName=booking-app   "
 );
@@ -29,10 +30,29 @@ app.post("/register", async (req, res) => {
         errMessage:
           "Account Already exists on this Email. Please Try another Email Account.",
       });
-    }else{
-        res.status(500);
-        res.json(err);
+    } else {
+      res.status(500);
+      res.json(err);
     }
+  }
+});
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  const userDoc = await UserModel.findOne({ email });
+  if (userDoc) {
+    const isPasswordCorrect = bcrypt.compareSync(password, userDoc.password);
+    if (isPasswordCorrect) {
+      jwt.sign({email:userDoc.email, id:userDoc._id},SecretKey,(err,token)=>{
+        if(err) throw err;
+        res.cookie('token',token).json(userDoc);
+      })
+    } else {
+      res.status(401);
+      res.json({ errMessage: "Invalid Password" });
+    }
+  } else {
+    res.status(500).json("not found");
   }
 });
 

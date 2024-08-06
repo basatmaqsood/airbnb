@@ -91,7 +91,7 @@ function RegisterPage() {
         </div>
       )}
       {
-        showErrorPrompt && <Modal message={errorMessage} setNavigation={false}/>
+        showErrorPrompt && <Modal message={errorMessage} setNavigation={false} setshowErrorPrompt={false}/>
       
       }
     </div>

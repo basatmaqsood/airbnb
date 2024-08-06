@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const Modal = ({ message, setNavigation }) => {
+const Modal = ({ message, setNavigation,setShowErrorPrompt }) => {
   const [ showWindow, setShowWindow ] = useState(true);
   console.log("hello");
   return (
@@ -17,6 +17,7 @@ const Modal = ({ message, setNavigation }) => {
           onClick={()=>{
             setShowWindow(false)
             setNavigation && setNavigation(true);
+            setShowErrorPrompt && setShowErrorPrompt(false);
           }}
           className="bg-primary text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none"
         >
