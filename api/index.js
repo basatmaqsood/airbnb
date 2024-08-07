@@ -4,15 +4,18 @@ const { default: mongoose } = require("mongoose");
 const UserModel = require("./models/User.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 app.use(cors({ credentials: true, origin: true }));
 app.use(express.json());
+app.use(cookieParser());
 mongoose.connect(
   "mongodb+srv://itzbasatmaqsood:SLlu9tzyflvHckaO@booking-app.9aulubl.mongodb.net/?retryWrites=true&w=majority&appName=booking-app   "
 );
 
 const SecretKey = bcrypt.genSaltSync(8);
+const jwtKey = "@basat1018!yeah@01-22-SE-01";
 
 app.post("/register", async (req, res) => {
   const { email, password, username } = req.body;
@@ -43,10 +46,14 @@ app.post("/login", async (req, res) => {
   if (userDoc) {
     const isPasswordCorrect = bcrypt.compareSync(password, userDoc.password);
     if (isPasswordCorrect) {
-      jwt.sign({email:userDoc.email, id:userDoc._id},SecretKey,(err,token)=>{
-        if(err) throw err;
-        res.cookie('token',token).json(userDoc);
-      })
+      jwt.sign(
+        { email: userDoc.email, id: userDoc._id, username: userDoc.username },
+        jwtKey,
+        (err, token) => {
+          if (err) throw err;
+          res.cookie("token", token).json(userDoc);
+        }
+      );
     } else {
       res.status(401);
       res.json({ errMessage: "Invalid Password" });
@@ -56,4 +63,15 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.get("/profile", (req, res) => {
+  const { token } = req.cookies;
+  if (token) {
+    jwt.verify(token, jwtKey, (err, data) => {
+      if (err) throw err;
+      res.json(data);
+    });
+  } else {
+    res.json(null);
+  }
+});
 app.listen(4000);

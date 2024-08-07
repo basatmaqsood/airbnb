@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import axios from 'axios';
 import Modal from "../components/PromptWindow";
+import { UserContext } from "../context/UserContext";
 
 function LoginPage() {
 
@@ -9,11 +10,12 @@ function LoginPage() {
   const [password,setPassword] = useState('');
   const [redirect,setRedirect] = useState(false);
   const [showErrorPrompt, setShowErrorPropmpt] = useState(false);
-
+  const {setUser} = useContext(UserContext);
   async function handleSubmit(e){
     e.preventDefault();
     try{
-      await axios.post('/login',{email,password})
+      const res = await axios.post('/login',{email,password})
+      setUser(res.data);
       setRedirect(true);
     }catch(err){
       console.log(err);
