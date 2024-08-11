@@ -5,17 +5,16 @@ import { Link } from "react-router-dom";
 function ListMyPlaces() {
   const [places, setPlaces] = useState([]);
   useEffect(() => {
-    axios.get("/places").then((res) => {
+    axios.get("/userPlaces").then((res) => {
       setPlaces(res.data);
     });
   }, []);
-  console.log(places);
   return (
     <div className="mt-4 flex flex-col gap-2">
       {places.length > 0 &&
         places.map((place, i) => {
           return (
-            <Link to={`/account/places/view/${place._id}`}
+            <Link to={`/account/places/edit/${place._id}`}
               key={i}
               className="bg-gray-100 sm:p-0 p-3  flex gap-4 rounded-2xl items-center cursor-pointer"
             >

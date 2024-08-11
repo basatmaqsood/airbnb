@@ -1,4 +1,5 @@
-import { useState } from "react";
+/* eslint-disable react/prop-types */
+import { useEffect, useState } from "react";
 import InputHeader from "./InputHeader";
 import PerksInput from "./PerksInput";
 import UploadPictures from "./UploadPictures";
@@ -7,7 +8,7 @@ import ExtraInfo from "./ExtraInfo";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
 
-function AddNewPlace() {
+function AddNewPlace({ place = null,id=null }) {
   const [title, setTitle] = useState("");
   const [address, setAddress] = useState("");
   const [addedPhotos, setaddedPhotos] = useState([]);
@@ -17,10 +18,26 @@ function AddNewPlace() {
   const [checkIn, setcheckIn] = useState("");
   const [checkOut, setcheckOut] = useState("");
   const [maxGuests, setmaxGuests] = useState("");
+  const [price, setPrice] = useState("");
   const [redirect, setRedirect] = useState(false);
+
+  useEffect(() => {
+    if (place) {
+      setTitle(place.title);
+      setAddress(place.address);
+      setaddedPhotos(place.photos);
+      setDescription(place.description);
+      setPerks(place.perks);
+      setcheckIn(place.checkIn);
+      setcheckOut(place.checkOut);
+      setmaxGuests(place.maxGuests);
+      setPrice(place.price);
+    }
+  }, [place]);
 
   async function saveNewPlace(e) {
     e.preventDefault();
+
     const newPlace = {
       title,
       address,
@@ -30,15 +47,24 @@ function AddNewPlace() {
       checkIn,
       checkOut,
       maxGuests,
+      price,
     };
-    try{
-
-      const res = await axios.post("/places", newPlace);
-      console.log(res);
-      setRedirect(true);
-    }catch(err){
-      console.log(err);
-      alert("Cannot Save the Place");
+    if (place) {
+      try {
+        await axios.put("/places/"+id , newPlace);
+        setRedirect(true);
+      } catch (err) {
+        console.log(err);
+        alert("Cannot Save the Place");
+      }
+    } else {
+      try {
+        await axios.post("/places", newPlace);
+        setRedirect(true);
+      } catch (err) {
+        console.log(err);
+        alert("Cannot Save the Place");
+      }
     }
   }
   if (redirect) {
@@ -104,6 +130,8 @@ function AddNewPlace() {
             setcheckOut={setcheckOut}
             maxGuests={maxGuests}
             setmaxGuests={setmaxGuests}
+            price={price}
+            setPrice={setPrice}
           />
           <button className="bg-primary text-white py-2 px-6 rounded-full inline-flex items-center gap-2 mt-4">
             Save

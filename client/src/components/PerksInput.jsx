@@ -19,6 +19,7 @@ function PerksInput({ perks, setPerks }) {
     <div className="grid gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-5 mt-2">
       <label className="border p-4 flex rounded-2xl gap-2 items-center cursor-pointer">
         <input
+        checked={perks.includes("wifi")}
           type="checkbox"
           onChange={() => {
             handlePerks("wifi");
@@ -29,6 +30,7 @@ function PerksInput({ perks, setPerks }) {
       </label>
       <label className="border p-4 flex rounded-2xl gap-2 items-center cursor-pointer">
         <input
+        checked={perks.includes("parking")}
           type="checkbox"
           onChange={() => {
             handlePerks("parking");
@@ -39,6 +41,7 @@ function PerksInput({ perks, setPerks }) {
       </label>
       <label className="border p-4 flex rounded-2xl gap-2 items-center cursor-pointer">
         <input
+        checked={perks.includes("pets")}
           type="checkbox"
           onChange={() => {
             handlePerks("pets");
@@ -49,6 +52,7 @@ function PerksInput({ perks, setPerks }) {
       </label>
       <label className="border p-4 flex rounded-2xl gap-2 items-center cursor-pointer">
         <input
+        checked={perks.includes("entrance")}
           type="checkbox"
           onChange={() => {
             handlePerks("entrance");
@@ -59,6 +63,7 @@ function PerksInput({ perks, setPerks }) {
       </label>
       <label className="border p-4 flex rounded-2xl gap-2 items-center cursor-pointer">
         <input
+        checked={perks.includes("tv")}
           type="checkbox"
           onChange={() => {
             handlePerks("tv");

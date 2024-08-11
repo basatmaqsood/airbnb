@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 
-function ExtraInfo({ checkIn, setcheckIn, checkOut, setcheckOut, maxGuests, setmaxGuests }) {
+function ExtraInfo({ checkIn, setcheckIn, checkOut, setcheckOut, maxGuests, setmaxGuests,price,setPrice }) {
   return (
     <div className="grid gap-2 sm:grid-cols-3">
           <input
@@ -20,6 +20,12 @@ function ExtraInfo({ checkIn, setcheckIn, checkOut, setcheckOut, maxGuests, setm
             placeholder="Max Guests i.e. 4"
             value={maxGuests}
             onChange={(e) => setmaxGuests(e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder="Price Per Night i.e. $10"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
           />
         </div>
     )

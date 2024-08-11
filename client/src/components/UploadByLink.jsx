@@ -7,7 +7,6 @@ function UploadByLink({ photoLink, setPhotoLink, addedPhotos, setaddedPhotos }) 
   function addPhotoByLink(e) {
     e.preventDefault();
     axios.post("/upload-by-link", { link: photoLink }).then(({ data }) => {
-        console.log(data);
         setaddedPhotos([...addedPhotos, data]);
       }).catch((err) => {
         console.log(err);
@@ -17,7 +16,7 @@ function UploadByLink({ photoLink, setPhotoLink, addedPhotos, setaddedPhotos }) 
   }
   return (
     <>
-            <InputHeader heading="Photos" description="More = Better" />
+            <InputHeader heading="Photos" description="Upload Main Photo as first" />
         <div className="flex gap-2 flex-col sm:flex-row">
           <input
             type="text"

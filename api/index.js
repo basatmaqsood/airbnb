@@ -6,7 +6,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const imageDownloader = require("image-downloader");
-const multer = require("multer")
+const multer = require("multer");
 const UserModel = require("./models/User.js");
 const PlaceModel = require("./models/Place.js");
 
@@ -86,7 +86,6 @@ app.post("/logout", (req, res) => {
 
 app.post("/upload-by-link", (req, res) => {
   const { link } = req.body;
-  console.log(link);
   const name = "img" + Date.now() + ".jpg";
   imageDownloader
     .image({
@@ -107,20 +106,17 @@ const photoMiddleWare = multer({
 });
 
 app.post("/upload", photoMiddleWare.array("photos", 100), (req, res) => {
-  console.log(1);
-const uploadedFiles = [];
+  const uploadedFiles = [];
   for (let i = 0; i < req.files.length; i++) {
     const { path, originalname } = req.files[i];
     const part = originalname.split(".");
     const ext = part[part.length - 1];
-    const newName = path + "." + ext ;
+    const newName = path + "." + ext;
     fs.renameSync(path, newName);
     uploadedFiles.push(newName.split("\\")[newName.split("\\").length - 1]);
   }
   res.json(uploadedFiles);
 });
-
-
 
 app.post("/places", (req, res) => {
   const { token } = req.cookies;
@@ -134,25 +130,66 @@ app.post("/places", (req, res) => {
     });
   } else {
     res.status(500);
-    res.json('Not Authenticated');
+    res.json("Not Authenticated");
   }
 });
 
-app.get("/places", (req, res) => {
-
+app.get("/userPlaces", (req, res) => {
   const { token } = req.cookies;
   if (token) {
     jwt.verify(token, jwtKey, (err, data) => {
       if (err) throw err;
-      const id = data.id; 
-      PlaceModel.find({owner:id}).then((placeDoc) => {
+      const id = data.id;
+      PlaceModel.find({ owner: id }).then((placeDoc) => {
         res.json(placeDoc);
       });
     });
   } else {
     res.status(500);
-    res.json('Not Authenticated');
+    res.json("Not Authenticated");
   }
+});
 
+app.get("/places", (req, res) => {
+  PlaceModel.find().then((placeDoc) => {
+    res.json(placeDoc);
+  }).catch((err) => {
+    res.status(500).json(err);
+  });
+});
+
+app.get("/places/:id", (req, res) => {
+  const { id } = req.params;
+  PlaceModel.findById(id)
+    .then((placeDoc) => {
+      res.json(placeDoc);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+app.put("/places/:id",  (req, res) => {
+  const { token } = req.cookies;
+  const {id} = req.params;
+
+  if (token) {
+    jwt.verify(token, jwtKey, async (err, data) => {
+      if (err) throw err;
+      const placeDoc = await PlaceModel.findById(id);
+      if (placeDoc.owner.toString() === data.id) {
+       placeDoc.set(req.body);
+        placeDoc.save().then((placeDoc) => {
+          res.json('ok');
+        });
+      } else {
+        res.status(401);
+        res.json("Not Authorized");
+      }
+    });
+  } else {
+    res.status(500);
+    res.json("Not Authenticated");
+  }
 });
 app.listen(4000);
