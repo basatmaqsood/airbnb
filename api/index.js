@@ -120,6 +120,8 @@ const uploadedFiles = [];
   res.json(uploadedFiles);
 });
 
+
+
 app.post("/places", (req, res) => {
   const { token } = req.cookies;
   if (token) {
@@ -134,5 +136,23 @@ app.post("/places", (req, res) => {
     res.status(500);
     res.json('Not Authenticated');
   }
+});
+
+app.get("/places", (req, res) => {
+
+  const { token } = req.cookies;
+  if (token) {
+    jwt.verify(token, jwtKey, (err, data) => {
+      if (err) throw err;
+      const id = data.id; 
+      PlaceModel.find({owner:id}).then((placeDoc) => {
+        res.json(placeDoc);
+      });
+    });
+  } else {
+    res.status(500);
+    res.json('Not Authenticated');
+  }
+
 });
 app.listen(4000);
