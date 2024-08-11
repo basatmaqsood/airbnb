@@ -1,15 +1,19 @@
 const express = require("express");
 const cors = require("cors");
+const fs = require("fs");
 const { default: mongoose } = require("mongoose");
 const UserModel = require("./models/User.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
+const imageDownloader = require("image-downloader");
+const multer = require("multer");
 
 const app = express();
 app.use(cors({ credentials: true, origin: true }));
 app.use(express.json());
 app.use(cookieParser());
+app.use("/uploads", express.static(__dirname + "/uploads"));
 mongoose.connect(
   "mongodb+srv://itzbasatmaqsood:SLlu9tzyflvHckaO@booking-app.9aulubl.mongodb.net/?retryWrites=true&w=majority&appName=booking-app   "
 );
@@ -75,8 +79,41 @@ app.get("/profile", (req, res) => {
   }
 });
 
+app.post("/logout", (req, res) => {
+  res.cookie("token", "").json(true);
+});
 
-app.post('/logout',(req,res)=>{
-  res.cookie('token','').json(true);
-})
+app.post("/upload-by-link", (req, res) => {
+  const { link } = req.body;
+  const name = "img" + Date.now() + ".jpg";
+  imageDownloader
+    .image({
+      url: link,
+      dest: __dirname + "/uploads/" + name,
+    })
+    .then(({ resp }) => {
+      res.json(name);
+    })
+    .catch((err) => {
+      res.status(500);
+      res.json("Cannot upload image. Try another.");
+    });
+});
+
+const photoMiddleWare = multer({
+  dest: "uploads/",
+});
+
+app.post("/upload", photoMiddleWare.array("photos", 100), (req, res) => {
+const uploadedFiles = [];
+  for (let i = 0; i < req.files.length; i++) {
+    const { path, originalname } = req.files[i];
+    const part = originalname.split(".");
+    const ext = part[part.length - 1];
+    const newName = path + "." + ext ;
+    fs.renameSync(path, newName);
+    uploadedFiles.push(newName.split("\\")[newName.split("\\").length - 1]);
+  }
+  res.json(uploadedFiles);
+});
 app.listen(4000);
