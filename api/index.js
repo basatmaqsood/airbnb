@@ -12,7 +12,7 @@ const PlaceModel = require("./models/Place.js");
 const BookingModel = require("./models/Booking.js");
 
 const app = express();
-app.use(cors({ credentials: true, origin: true }));
+app.use(cors({ credentials: true, origin: true,methods: "GET,HEAD,PUT,PATCH,POST,DELETE" }));
 app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static(__dirname + "/uploads"));
