@@ -229,4 +229,8 @@ app.get("/bookings", (req, res) => {
     });
   }
 });
+
+app.get('*', (req, res) => {
+  res.json("404 Not Found");
+ });
 app.listen(4000);
