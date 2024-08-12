@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
-const mongoose = require("mongoose");
+const { default: mongoose } = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
@@ -12,16 +12,16 @@ const PlaceModel = require("./models/Place.js");
 const BookingModel = require("./models/Booking.js");
 
 const app = express();
-app.use(cors({ credentials: true, origin: true, methods: "GET,HEAD,PUT,PATCH,POST,DELETE" }));
+app.use(cors({ credentials: true, origin: true,methods: "GET,HEAD,PUT,PATCH,POST,DELETE" }));
 app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static(__dirname + "/uploads"));
-
-// Use environment variables for sensitive data
-mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(
+  "mongodb+srv://itzbasatmaqsood:SLlu9tzyflvHckaO@booking-app.9aulubl.mongodb.net/?retryWrites=true&w=majority&appName=booking-app   "
+);
 
 const SecretKey = bcrypt.genSaltSync(8);
-const jwtKey = process.env.JWT_KEY;
+const jwtKey = "@basat1018!yeah@01-22-SE-01";
 
 app.post("/register", async (req, res) => {
   const { email, password, username } = req.body;
@@ -34,30 +34,38 @@ app.post("/register", async (req, res) => {
     res.json(userDoc);
   } catch (err) {
     if (err.code === 11000) {
-      res.status(422).json({
-        errMessage: "Account Already exists on this Email. Please Try another Email Account.",
+      res.status(422);
+      res.json({
+        errMessage:
+          "Account Already exists on this Email. Please Try another Email Account.",
       });
     } else {
-      res.status(500).json(err);
+      res.status(500);
+      res.json(err);
     }
   }
 });
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  try {
-    const userDoc = await UserModel.findOne({ email });
-    if (!userDoc) return res.status(404).json({ errMessage: "User not found" });
-
+  const userDoc = await UserModel.findOne({ email });
+  if (userDoc) {
     const isPasswordCorrect = bcrypt.compareSync(password, userDoc.password);
-    if (!isPasswordCorrect) return res.status(401).json({ errMessage: "Invalid Password" });
-
-    jwt.sign({ email: userDoc.email, id: userDoc._id, username: userDoc.username }, jwtKey, (err, token) => {
-      if (err) return res.status(500).json({ errMessage: "Failed to generate token" });
-      res.cookie("token", token).json(userDoc);
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Internal Server Error" });
+    if (isPasswordCorrect) {
+      jwt.sign(
+        { email: userDoc.email, id: userDoc._id, username: userDoc.username },
+        jwtKey,
+        (err, token) => {
+          if (err) throw err;
+          res.cookie("token", token).json(userDoc);
+        }
+      );
+    } else {
+      res.status(401);
+      res.json({ errMessage: "Invalid Password" });
+    }
+  } else {
+    res.status(500).json("not found");
   }
 });
 
@@ -65,7 +73,7 @@ app.get("/profile", (req, res) => {
   const { token } = req.cookies;
   if (token) {
     jwt.verify(token, jwtKey, (err, data) => {
-      if (err) return res.status(500).json({ error: "Failed to verify token" });
+      if (err) throw err;
       res.json(data);
     });
   } else {
@@ -83,19 +91,22 @@ app.post("/upload-by-link", (req, res) => {
   imageDownloader
     .image({
       url: link,
-      dest: "/tmp/" + name,
+      dest: __dirname + "/uploads/" + name,
     })
     .then(({ resp }) => {
       res.json(name);
     })
     .catch((err) => {
-      res.status(500).json("Cannot upload image. Try another.");
+      res.status(500);
+      res.json("Cannot upload image. Try another.");
     });
 });
 
-const photoMiddleware = multer({ dest: "/tmp/uploads/" });
+const photoMiddleWare = multer({
+  dest: "uploads/",
+});
 
-app.post("/upload", photoMiddleware.array("photos", 100), (req, res) => {
+app.post("/upload", photoMiddleWare.array("photos", 100), (req, res) => {
   const uploadedFiles = [];
   for (let i = 0; i < req.files.length; i++) {
     const { path, originalname } = req.files[i];
@@ -103,7 +114,7 @@ app.post("/upload", photoMiddleware.array("photos", 100), (req, res) => {
     const ext = part[part.length - 1];
     const newName = path + "." + ext;
     fs.renameSync(path, newName);
-    uploadedFiles.push(newName.split("/").pop());
+    uploadedFiles.push(newName.split("\\")[newName.split("\\").length - 1]);
   }
   res.json(uploadedFiles);
 });
@@ -112,14 +123,15 @@ app.post("/places", (req, res) => {
   const { token } = req.cookies;
   if (token) {
     jwt.verify(token, jwtKey, (err, data) => {
-      if (err) return res.status(500).json({ error: "Failed to verify token" });
+      if (err) throw err;
       const newPlace = { ...req.body, owner: data.id };
-      PlaceModel.create(newPlace)
-        .then((placeDoc) => res.json(placeDoc))
-        .catch((err) => res.status(500).json(err));
+      PlaceModel.create(newPlace).then((placeDoc) => {
+        res.json(placeDoc);
+      });
     });
   } else {
-    res.status(401).json("Not Authenticated");
+    res.status(500);
+    res.json("Not Authenticated");
   }
 });
 
@@ -127,27 +139,37 @@ app.get("/userPlaces", (req, res) => {
   const { token } = req.cookies;
   if (token) {
     jwt.verify(token, jwtKey, (err, data) => {
-      if (err) return res.status(500).json({ error: "Failed to verify token" });
-      PlaceModel.find({ owner: data.id })
-        .then((placeDoc) => res.json(placeDoc))
-        .catch((err) => res.status(500).json(err));
+      if (err) throw err;
+      const id = data.id;
+      PlaceModel.find({ owner: id }).then((placeDoc) => {
+        res.json(placeDoc);
+      });
     });
   } else {
-    res.status(401).json("Not Authenticated");
+    res.status(500);
+    res.json("Not Authenticated");
   }
 });
 
 app.get("/places", (req, res) => {
   PlaceModel.find()
-    .then((placeDoc) => res.json(placeDoc))
-    .catch((err) => res.status(500).json(err));
+    .then((placeDoc) => {
+      res.json(placeDoc);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
 });
 
 app.get("/places/:id", (req, res) => {
   const { id } = req.params;
   PlaceModel.findById(id)
-    .then((placeDoc) => res.json(placeDoc))
-    .catch((err) => res.status(500).json(err));
+    .then((placeDoc) => {
+      res.json(placeDoc);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
 });
 
 app.put("/places/:id", (req, res) => {
@@ -156,17 +178,21 @@ app.put("/places/:id", (req, res) => {
 
   if (token) {
     jwt.verify(token, jwtKey, async (err, data) => {
-      if (err) return res.status(500).json({ error: "Failed to verify token" });
+      if (err) throw err;
       const placeDoc = await PlaceModel.findById(id);
       if (placeDoc.owner.toString() === data.id) {
         placeDoc.set(req.body);
-        placeDoc.save().then(() => res.json("ok"));
+        placeDoc.save().then((placeDoc) => {
+          res.json("ok");
+        });
       } else {
-        res.status(403).json("Not Authorized");
+        res.status(401);
+        res.json("Not Authorized");
       }
     });
   } else {
-    res.status(401).json("Not Authenticated");
+    res.status(500);
+    res.json("Not Authenticated");
   }
 });
 
@@ -174,31 +200,37 @@ app.post("/book", (req, res) => {
   const { token } = req.cookies;
   const newBooking = req.body;
   if (token) {
-    jwt.verify(token, jwtKey, (err, data) => {
-      if (err) return res.status(500).json({ error: "Failed to verify token" });
+    jwt.verify(token, jwtKey, async (err, data) => {
+      if (err) throw err;
       BookingModel.create(newBooking)
-        .then((bookingDoc) => res.json(bookingDoc))
-        .catch((err) => res.status(500).json(err));
+        .then((bookingDoc) => {
+          res.json(bookingDoc);
+        })
+        .catch((err) => {
+          res.status(500).json(err);
+        });
     });
-  } else {
-    res.status(401).json("Not Authenticated");
   }
 });
 
 app.get("/bookings", (req, res) => {
   const { token } = req.cookies;
   if (token) {
-    jwt.verify(token, jwtKey, (err, data) => {
-      if (err) return res.status(500).json({ error: "Failed to verify token" });
+    jwt.verify(token, jwtKey, async (err, data) => {
+      if (err) throw err;
       BookingModel.find({ booker: data.id })
         .populate("place")
-        .then((bookingDoc) => res.json(bookingDoc))
-        .catch((err) => res.status(500).json(err));
+        .then((bookingDoc) => {
+          res.json(bookingDoc);
+        })
+        .catch((err) => {
+          res.status(500).json(err);
+        });
     });
-  } else {
-    res.status(401).json("Not Authenticated");
   }
 });
 
-// Export the app for Vercel
-module.exports = app;
+// app.get('/*', (req, res) => {
+//   res.json("404 Not Found");
+//  });
+app.listen(4000);
