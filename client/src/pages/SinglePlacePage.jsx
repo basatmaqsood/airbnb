@@ -14,7 +14,6 @@ function SinglePlacePage() {
   useEffect(() => {
     if (!id) return;
     axios.get(`/places/${id}`).then((res) => {
-      console.log(res.data);
       setPlace(res.data);
       setLoading(false);
     });
@@ -31,7 +30,7 @@ function SinglePlacePage() {
       <ShowDescription place={place} />
         <ShowExtraInfo place={place}/>
       </div> 
-        <ShowPriceBox place={place}/>
+        <ShowPriceBox place={place} />
       </div>
 
     </div>

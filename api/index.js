@@ -9,6 +9,7 @@ const imageDownloader = require("image-downloader");
 const multer = require("multer");
 const UserModel = require("./models/User.js");
 const PlaceModel = require("./models/Place.js");
+const BookingModel = require("./models/Booking.js");
 
 const app = express();
 app.use(cors({ credentials: true, origin: true }));
@@ -151,11 +152,13 @@ app.get("/userPlaces", (req, res) => {
 });
 
 app.get("/places", (req, res) => {
-  PlaceModel.find().then((placeDoc) => {
-    res.json(placeDoc);
-  }).catch((err) => {
-    res.status(500).json(err);
-  });
+  PlaceModel.find()
+    .then((placeDoc) => {
+      res.json(placeDoc);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
 });
 
 app.get("/places/:id", (req, res) => {
@@ -169,18 +172,18 @@ app.get("/places/:id", (req, res) => {
     });
 });
 
-app.put("/places/:id",  (req, res) => {
+app.put("/places/:id", (req, res) => {
   const { token } = req.cookies;
-  const {id} = req.params;
+  const { id } = req.params;
 
   if (token) {
     jwt.verify(token, jwtKey, async (err, data) => {
       if (err) throw err;
       const placeDoc = await PlaceModel.findById(id);
       if (placeDoc.owner.toString() === data.id) {
-       placeDoc.set(req.body);
+        placeDoc.set(req.body);
         placeDoc.save().then((placeDoc) => {
-          res.json('ok');
+          res.json("ok");
         });
       } else {
         res.status(401);
@@ -190,6 +193,24 @@ app.put("/places/:id",  (req, res) => {
   } else {
     res.status(500);
     res.json("Not Authenticated");
+  }
+});
+
+app.post("/book", (req, res) => {
+  const { token } = req.cookies;
+  const newBooking = req.body;
+  console.log(newBooking);
+  if (token) {
+    jwt.verify(token, jwtKey, async (err, data) => {
+      if (err) throw err;
+      BookingModel.create(newBooking)
+        .then((bookingDoc) => {
+          res.json(bookingDoc);
+        })
+        .catch((err) => {
+          res.status(500).json(err);
+        });
+    });
   }
 });
 app.listen(4000);

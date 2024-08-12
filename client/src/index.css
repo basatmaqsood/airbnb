@@ -6,7 +6,7 @@
 *{
     font-family: "Outfit", sans-serif;
 }
-input[type="text"],input[type="password"], input[type="email"],textarea,input[type="number"]{
+input[type="text"],input[type="password"], input[type="email"],textarea,input[type="number"],input[type="tel"]{
     @apply w-full border my-2 py-2 px-3 rounded-2xl outline-none;
 }
 button{
