@@ -21,10 +21,10 @@ function Main() {
             key={place._id}
             className="flex flex-col gap-2"
           >
-            <div className="flex">
+            <div className="flex overflow-hidden">
               {place.photos[0] && (
                 <img
-                  className="rounded-2xl object-cover aspect-square max-h-64"
+                  className="rounded-2xl object-cover aspect-square max-h-64 transform transition-transform duration-300 hover:scale-110 "
                   src={`http://localhost:4000/uploads/${place.photos[0]}`}
                   alt={place.name}
                 />
