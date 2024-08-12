@@ -2,10 +2,13 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ShowPlacePhotos from "../components/ShowPlacePhotos";
+import ShowExtraInfo from "../components/ShowExtraInfo";
+import ShowPriceBox from "../components/ShowPriceBox";
+import ShowPlaceHeader from "../components/ShowPlaceHeader";
+import ShowDescription from "../components/ShowDescription";
 
 function SinglePlacePage() {
   const [loading, setLoading] = useState(true);
-  const [showAll, setShowAll] = useState(false);
   const [place, setPlace] = useState({});
   const { id } = useParams();
   useEffect(() => {
@@ -20,16 +23,17 @@ function SinglePlacePage() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="mt-4 py-4 bg-gray-100 px-8">
-      <h1 className="text-3xl">{place.title}</h1>
-      <a
-        className="block underline font-semibold my-2 text-gray-700"
-        target="_blank"
-        href={`https:maps.google.com/?q=${place.address}`}
-      >
-        {place.address}
-      </a>
-      <ShowPlacePhotos photos={place.photos} showAll={showAll} setShowAll={setShowAll}/>
+    <div className="mt-4 py-4 bg-gray-100 px-8 flex flex-col gap-4">
+      <ShowPlaceHeader place={place} />
+      <ShowPlacePhotos photos={place.photos} id={id} />
+      <div className="flex sm:flex-row flex-col justify-between gap-4">
+     <div className="flex flex-col gap-4">
+      <ShowDescription place={place} />
+        <ShowExtraInfo place={place}/>
+      </div> 
+        <ShowPriceBox place={place}/>
+      </div>
+
     </div>
   );
 }

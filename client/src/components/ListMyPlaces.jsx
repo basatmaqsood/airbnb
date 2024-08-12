@@ -29,7 +29,7 @@ function ListMyPlaces() {
               </div>
               <div className="flex flex-col gap-1">
               <h2 className="text-2xl text-gray-900">{place.title}</h2>
-              <p>{place.description}</p>
+              <p >{place.description.substring(0,150)}...</p>
               </div>
             </Link>
           );
