@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { differenceInDays } from "date-fns";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import axios from "axios";
 import Modal from "./PromptWindow";
@@ -18,12 +18,17 @@ function ShowPriceBox({ place }) {
   const [showSuccessPrompt, setShowSuccessPrompt] = useState(false);
   const [showAccountLoginPrompt, setShowAccountLoginPrompt] = useState(false);
 
-  console.log(user);
   let totalprice =
     checkIn &&
     checkOut &&
     differenceInDays(new Date(checkOut), new Date(checkIn)) * place.price;
   totalprice = totalprice ? totalprice : 0;
+
+  useEffect(() => {
+    if (user) {
+      setName(user.username);
+    }
+  }, [user]);
 
   const booking = {
     name,
@@ -32,7 +37,7 @@ function ShowPriceBox({ place }) {
     checkOut,
     totalprice,
     place: place._id,
-    booker: user?._id,
+    booker: user?.id,
   };
 
   function bookNow() {
@@ -53,8 +58,8 @@ function ShowPriceBox({ place }) {
         console.log(err);
       });
   }
-    return (
-      <>
+  return (
+    <>
       <div className="text-center w-full sm:max-w-max bg-white p-4 rounded-2xl flex flex-col gap-3">
         <div>
           <h2 className="text-xl font-semibold">Price</h2>
@@ -125,11 +130,12 @@ function ShowPriceBox({ place }) {
           </button>
         </div>
       </div>
-      {showErrorPrompt && ( <Modal
-        message={"Please fill all the fields"}
-        setShowErrorPrompt={setShowErrorPrompt}
-        
-      />)}
+      {showErrorPrompt && (
+        <Modal
+          message={"Please fill all the fields"}
+          setShowErrorPrompt={setShowErrorPrompt}
+        />
+      )}
       {showSuccessPrompt && (
         <Modal
           message={`Booking Successfull for ${place.title} from ${checkIn} to ${checkOut}. You'll be redirected to Bookings Page`}
@@ -146,9 +152,8 @@ function ShowPriceBox({ place }) {
       )}
       {bookingNavigation && <Navigate to="/account/bookings" />}
       {accountNavigation && <Navigate to="/login" />}
-      </>
-
-    );
+    </>
+  );
 }
 
 export default ShowPriceBox;

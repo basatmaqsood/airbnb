@@ -199,11 +199,27 @@ app.put("/places/:id", (req, res) => {
 app.post("/book", (req, res) => {
   const { token } = req.cookies;
   const newBooking = req.body;
-  console.log(newBooking);
   if (token) {
     jwt.verify(token, jwtKey, async (err, data) => {
       if (err) throw err;
       BookingModel.create(newBooking)
+        .then((bookingDoc) => {
+          res.json(bookingDoc);
+        })
+        .catch((err) => {
+          res.status(500).json(err);
+        });
+    });
+  }
+});
+
+app.get("/bookings", (req, res) => {
+  const { token } = req.cookies;
+  if (token) {
+    jwt.verify(token, jwtKey, async (err, data) => {
+      if (err) throw err;
+      BookingModel.find({ booker: data.id })
+        .populate("place")
         .then((bookingDoc) => {
           res.json(bookingDoc);
         })
