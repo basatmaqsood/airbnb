@@ -22,7 +22,7 @@ mongoose.connect(
 
 const SecretKey = bcrypt.genSaltSync(8);
 const jwtKey = "@basat1018!yeah@01-22-SE-01";
-const port = Process.env.PORT || 4000;
+const port = process.env.PORT || 4000;
 
 app.post("/register", async (req, res) => {
   const { email, password, username } = req.body;
