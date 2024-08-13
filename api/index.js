@@ -22,6 +22,7 @@ mongoose.connect(
 
 const SecretKey = bcrypt.genSaltSync(8);
 const jwtKey = "@basat1018!yeah@01-22-SE-01";
+const port = Process.env.PORT || 4000;
 
 app.post("/register", async (req, res) => {
   const { email, password, username } = req.body;
@@ -233,4 +234,4 @@ app.get("/bookings", (req, res) => {
 // app.get('/*', (req, res) => {
 //   res.json("404 Not Found");
 //  });
-app.listen(4000);
+app.listen(port);
