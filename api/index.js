@@ -235,3 +235,4 @@ app.get("/bookings", (req, res) => {
 //   res.json("404 Not Found");
 //  });
 app.listen(port);
+module.exports = app;
