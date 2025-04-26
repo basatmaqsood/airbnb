@@ -25,7 +25,7 @@ function ShowPlacePhotos({ photos, id }) {
           {photos[1] && (
             <img
               className="hidden md:block  aspect-square object-cover w-full transform transition-transform duration-300 hover:scale-110"
-              src={`http://localhost:4000/uploads/${photos[1]}`}
+              src={`https://api-airbnb.basatmaqsood.com/uploads/${photos[1]}`}
               alt=""
             />
           )}

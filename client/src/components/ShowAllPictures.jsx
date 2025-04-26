@@ -33,7 +33,7 @@ function ShowAllPictures() {
                 <img
                     key={photo}
                     className="aspect-square object-cover w-full"
-                    src={`http://localhost:4000/uploads/${photo}`}
+                    src={`http://api-airbnb.basatmaqsood.com/uploads/${photo}`}
                     alt=""
                 />
                 ))}
