@@ -12,17 +12,15 @@ const PlaceModel = require("./models/Place.js");
 const BookingModel = require("./models/Booking.js");
 
 const app = express();
-app.use(cors({ credentials: true, origin: true,methods: "GET,HEAD,PUT,PATCH,POST,DELETE" }));
+app.use(cors({ credentials: true, origin: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static(__dirname + "/uploads"));
-mongoose.connect(
-  "mongodb+srv://itzbasatmaqsood:SLlu9tzyflvHckaO@booking-app.9aulubl.mongodb.net/?retryWrites=true&w=majority&appName=booking-app   "
-);
+mongoose.connect("mongodb+srv://itzbasatmaqsood:mj6THfVfpSn4CXW6@cluster0.1usflgg.mongodb.net/AirBnB?retryWrites=true&w=majority&appName=Cluster0").then(() => console.log("MongoDB Connected"))
+
 
 const SecretKey = bcrypt.genSaltSync(8);
 const jwtKey = "@basat1018!yeah@01-22-SE-01";
-const port = process.env.PORT || 4000;
 
 app.post("/register", async (req, res) => {
   const { email, password, username } = req.body;
@@ -230,10 +228,4 @@ app.get("/bookings", (req, res) => {
     });
   }
 });
-
-// app.get('/*', (req, res) => {
-//   res.json("404 Not Found");
-//  });
-app.listen(port);
-
-export default app;
+app.listen(8002);

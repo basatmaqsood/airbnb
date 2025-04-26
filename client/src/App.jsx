@@ -10,7 +10,8 @@ import AccountPage from "./pages/AccountPage";
 import SinglePlacePage from "./pages/SinglePlacePage";
 import ShowAllPictures from "./components/ShowAllPictures";
 
-axios.defaults.baseURL = "https://api-airbnb.basatmaqsood.com";
+axios.defaults.baseURL = "http://localhost:8002";
+// axios.defaults.baseURL = "https://api-airbnb.basatmaqsood.com";
 // axios.defaults.baseURL = "https://airbnb-api-iota.vercel.app";
 axios.defaults.withCredentials = true;
 
